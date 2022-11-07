@@ -70,6 +70,7 @@ AddCompilerFlags(YAML_GEN_ARGS)
 
 set(YAML_GEN_ARGS ${YAML_GEN_ARGS}
   -Wno-inconsistent-missing-override
+  -Wno-asm-operand-widths
   ${SYSROOT_ARG})
 
 add_custom_target(yaml_data

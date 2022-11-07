@@ -21,6 +21,7 @@
 
 #include "sliders.h"
 #include "opentx.h"
+#include "switches.h"
 
 enum slider_type {
   SLIDER_HORIZ,
@@ -94,8 +95,8 @@ void MainView6POS::paint(BitmapBuffer * dc)
   }
 
   // The square
-  value = (potsPos[idx] & 0x0f);
-  x = MULTIPOS_W_SPACING/4+MULTIPOS_W_SPACING*value;
+  value = 1 + getXPotPosition(idx);
+  x = MULTIPOS_W_SPACING / 4 + MULTIPOS_W_SPACING * value;
   drawTrimSquare(dc, x, 0, COLOR_THEME_FOCUS);
   dc->drawNumber(x+MULTIPOS_W_SPACING/4, -2, value+1, FONT(BOLD) | COLOR_THEME_PRIMARY2);
 #endif
@@ -104,8 +105,7 @@ void MainView6POS::paint(BitmapBuffer * dc)
 void MainView6POS::checkEvents()
 {
   Window::checkEvents();
-#if NUM_XPOTS > 0 // prevent compiler warning
-  int16_t newValue = 1 + (potsPos[idx] & 0x0f);
+  int16_t newValue = 1 + getXPotPosition(idx);
   if (value != newValue) {
     value = newValue;
     invalidate();

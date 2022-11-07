@@ -23,6 +23,10 @@
 #include "button_matrix.h"
 #include "opentx.h"
 
+#include "hal/adc_driver.h"
+#include "hal/switch_driver.h"
+#include "strhelpers.h"
+
 #define SET_DIRTY()     storageDirty(EE_MODEL)
 
 static const lv_coord_t line_col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1),
@@ -157,8 +161,7 @@ PreflightChecks::PreflightChecks() : Page(ICON_MODEL_SETUP)
 static std::string switchWarninglabel(swsrc_t index)
 {
   auto warn_pos = g_model.switchWarningState >> (3 * index) & 0x07;
-  return TEXT_AT_INDEX(STR_VSRCRAW,
-                       (index + MIXSRC_FIRST_SWITCH - MIXSRC_Rud + 1)) +
+  return std::string(switchGetName(index)) +
          std::string(getSwitchWarnSymbol(warn_pos));
 }
 
@@ -234,16 +237,9 @@ PotWarnMatrix::PotWarnMatrix(Window* parent, const rect_t& r) :
 {
   // Setup button layout & texts
   uint8_t btn_cnt = 0;
-  for (uint8_t i = POT_FIRST; i <= POT_LAST; i++) {
-    if ((IS_POT(i) || IS_POT_MULTIPOS(i)) && IS_POT_AVAILABLE(i)) {
-      pot_idx[btn_cnt] = i - POT_FIRST;
-      btn_cnt++;
-    }
-  }
-
-  for (int8_t i = SLIDER_FIRST; i <= SLIDER_LAST; i++) {
-    if (IS_SLIDER(i)) {
-      pot_idx[btn_cnt] = i - POT_FIRST;
+  for (uint8_t i = 0; i <= MAX_POTS; i++) {
+    if (IS_POT_AVAILABLE(i)) {
+      pot_idx[btn_cnt] = i;
       btn_cnt++;
     }
   }
@@ -251,15 +247,9 @@ PotWarnMatrix::PotWarnMatrix(Window* parent, const rect_t& r) :
   initBtnMap(3, btn_cnt);
 
   uint8_t btn_id = 0;
-  for (uint16_t i = POT_FIRST; i <= POT_LAST; i++) {
-    if ((IS_POT(i) || IS_POT_MULTIPOS(i)) && IS_POT_AVAILABLE(i)) {
-      setText(btn_id, STR_VSRCRAW[i + 1]);
-      btn_id++;
-    }
-  }
-  for (int8_t i = SLIDER_FIRST; i <= SLIDER_LAST; i++) {
-    if (IS_SLIDER(i)) {
-      setText(btn_id, STR_VSRCRAW[i + 1]);
+  for (uint16_t i = 0; i <= MAX_POTS; i++) {
+    if (IS_POT_AVAILABLE(i)) {
+      setText(btn_id, getPotName(i));
       btn_id++;
     }
   }
