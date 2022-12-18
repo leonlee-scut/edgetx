@@ -110,7 +110,6 @@ void MainView6POS::checkEvents()
     value = newValue;
     invalidate();
   }
-#endif
 }
 
 MainViewVerticalSlider::MainViewVerticalSlider(Window* parent, uint8_t idx) :
